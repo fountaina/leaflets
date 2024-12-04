@@ -1,0 +1,26 @@
+{
+  "name": "leaflets",
+  "version": "1.0.0",
+  "description": "A web app that stores book notes",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fountaina/leaflets.git"
+  },
+  "author": "Fountain Ehidiamhen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fountaina/leaflets/issues"
+  },
+  "homepage": "https://github.com/fountaina/leaflets#readme",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "pg": "^8.13.1"
+  }
+}
