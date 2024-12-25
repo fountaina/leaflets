@@ -1,5 +1,14 @@
-body {
-  background-color: red;
+nav {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+nav .nav-links {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+header {
+  background-image: url("../../images/leaf-background.jpg");
 }
 
 /*# sourceMappingURL=main.css.map */
