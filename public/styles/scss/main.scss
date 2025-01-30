@@ -1,1 +1,17 @@
 @import "header";
+
+// Website colors
+$primary-color: #6fc276;
+$secondary-color: #D3D3D3;
+$accent-color: #FFDF00;
+
+body {
+    
+    
+}
+
+// Website fonts
+@mixin primaryFont {
+    font-family: 'Merriweather';
+}
+
