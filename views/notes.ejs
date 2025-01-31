@@ -1,0 +1,12 @@
+<body>
+    <%- include ("partials/header.ejs") %>
+
+    <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
+    <ol>
+        <% notes.forEach((note) => { %>
+            <li> <%= note.note %> </li>
+        <% }); %>
+    </ol>
+
+</body>
+</html>

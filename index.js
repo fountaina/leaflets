@@ -11,17 +11,31 @@ app.use(bodyParser.urlencoded({ extended: true }));
 db.connect();
 
 async function getBooks() {
-    // Gets all items from  the database
-    const result = await db.query("SELECT book_name FROM books");
+    // Gets all the books stored in the db
+    const result = await db.query("SELECT * FROM books");
     let books = [];
     result.rows.forEach((book) => {
-        books.push(book.book_name);
+        books.push(book);
     });
     console.log(books);
     return books;
   };
 
+async function getNotes(bookId) {
+    // Gets all the notes for each book stored in db with the book name included
+    const result = await db.query("SELECT note, book_name FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
+
+    const notes = [];
+    result.rows.forEach((note) => {
+        notes.push(note);
+    });
+    console.log(notes);
+    return notes;
+}
+
+
 // Handles logic for landing page
+// Displays all the Books entered in the database
 app.get("/", async (req, res) => {
     try {
         const availableBooks = await getBooks();
@@ -31,6 +45,19 @@ app.get("/", async (req, res) => {
         res.status(500).send("Error fetching Books!");
     }
 });
+
+// Handles the logic for displaying the notes of each book
+app.get("/books", async (req, res) => {
+    const bookId = req.query.id;
+    try {
+        const notes = await getNotes(bookId);
+        res.render("notes.ejs", {notes: notes});
+    } catch (error) {
+        console.error("Error fetching notes", error);
+        res.status(500).send("Error fetching Notes!");
+    }
+
+})
 
 // Activates the port
 app.listen(port, () => {

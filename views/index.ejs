@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflets</title>
-    <link rel="stylesheet" href="styles/css/main.css">
-</head>
 <body>
     <%- include ("partials/header.ejs") %>
 
     <h3>My Books</h3>
     <ol>
         <% books.forEach((book) => { %>
-            <li> <a href=""><%= book %> </a> </li>
+            <li> <a href="/books?id=<%= book.id %>"><%= book.book_name %> </a> </li>
         <% }); %>
     </ol>
 
