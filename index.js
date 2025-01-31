@@ -10,17 +10,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 db.connect();
 
-async function getItems() {
+async function getBooks() {
     // Gets all items from  the database
-    const result = await db.query("SELECT * FROM books INNER JOIN notes ON books.id = notes.book_id;");
-    console.log(result.rows);
-    return result.rows;
+    const result = await db.query("SELECT book_name FROM books");
+    let books = [];
+    result.rows.forEach((book) => {
+        books.push(book.book_name);
+    });
+    console.log(books);
+    return books;
   };
 
 // Handles logic for landing page
 app.get("/", async (req, res) => {
-    getItems();
-    res.render("index.ejs");
+    try {
+        const availableBooks = await getBooks();
+        res.render("index.ejs", {books: availableBooks});
+    } catch (error) {
+        console.error("Error fetching books", error);
+        res.status(500).send("Error fetching Books!");
+    }
 });
 
 // Activates the port
