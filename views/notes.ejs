@@ -11,5 +11,14 @@
     <% } else { %>
         <h3>No notes for this book!</h3>
     <% } %>
+
+   <em><h3>Add New Note</h3></em>
+   <form action="/addnote" method="POST">
+        <label for="note">Enter Note:</label>
+        <input type="text" id="note" name="note" required>
+        <input type="hidden" name="book_id" value="<%=bookId%>">
+        <button type="submit">Add</button>
+   </form>
+
 </body>
 </html>

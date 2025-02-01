@@ -23,7 +23,7 @@ async function getBooks() {
 
 async function getNotes(bookId) {
     // Gets all the notes for each book stored in db with the book name included
-    const result = await db.query("SELECT note, book_name FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
+    const result = await db.query("SELECT note, book_name, book_id FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
 
     const notes = [];
     result.rows.forEach((note) => {
@@ -50,7 +50,7 @@ app.get("/books", async (req, res) => {
     const bookId = req.query.id;
     try {
         const notes = await getNotes(bookId);
-        res.render("notes.ejs", {notes: notes});
+        res.render("notes.ejs", {notes: notes, bookId: bookId});
     } catch (error) {
         console.error("Error fetching notes", error);
         res.status(500).send("Error fetching Notes!");
@@ -75,6 +75,20 @@ app.post("/addbook", async(req, res) => {
         res.status(500).send("Error occured while adding new book");
     }
     res.redirect("/");
+});
+
+app.post("/addnote", async(req, res) => {
+    const note = req.body.note;
+    const book_id = req.body.book_id;
+
+    try {
+        db.query("INSERT INTO notes (note, book_id) VALUES ($1, $2)", [note, book_id]);
+    } catch (error) {
+        console.error("Error adding new note: " + error);
+        res.status(500).send("Error adding new note!");
+    }
+
+    res.redirect(`/books?id=${book_id}`);
 });
 
 // Activates the port
