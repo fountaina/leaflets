@@ -1,12 +1,15 @@
 <body>
     <%- include ("partials/header.ejs") %>
 
-    <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
-    <ol>
-        <% notes.forEach((note) => { %>
-            <li> <%= note.note %> </li>
-        <% }); %>
-    </ol>
-
+    <% if (notes.length != 0) { %>
+        <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
+        <ol>
+            <% notes.forEach((note) => { %>
+                <li> <%= note.note %> </li>
+            <% }); %>
+        </ol>
+    <% } else { %>
+        <h3>No notes for this book!</h3>
+    <% } %>
 </body>
 </html>

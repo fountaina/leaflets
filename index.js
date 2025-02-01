@@ -31,8 +31,7 @@ async function getNotes(bookId) {
     });
     console.log(notes);
     return notes;
-}
-
+};
 
 // Handles logic for landing page
 // Displays all the Books entered in the database
@@ -57,7 +56,26 @@ app.get("/books", async (req, res) => {
         res.status(500).send("Error fetching Notes!");
     }
 
-})
+});
+
+// Displays the form page to add new book
+app.get("/newbook", async (req, res) => {
+    res.render("newbook.ejs");
+});
+
+// Handles logic for adding new book to the db
+app.post("/addbook", async(req, res) => {
+    const bookName = req.body.book_name;
+    const bookAuthor = req.body.author;
+
+    try {
+        db.query("INSERT INTO books (book_name, author) VALUES ($1, $2)", [bookName, bookAuthor])
+    } catch (error) {
+        console.error("Error adding book: " + error);
+        res.status(500).send("Error occured while adding new book");
+    }
+    res.redirect("/");
+});
 
 // Activates the port
 app.listen(port, () => {

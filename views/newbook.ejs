@@ -1,0 +1,14 @@
+<body>
+    <%- include ("partials/header.ejs") %>
+
+    <form action="/addbook" method="POST">
+        <label for="book_name">Book Name:</label>
+        <input type="text" id="book_name" name="book_name" required autofocus="True">
+
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
