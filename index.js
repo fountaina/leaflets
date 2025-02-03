@@ -23,7 +23,7 @@ async function getBooks() {
 
 async function getNotes(bookId) {
     // Gets all the notes for each book stored in db with the book name included
-    const result = await db.query("SELECT note, book_name, book_id FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
+    const result = await db.query("SELECT notes.id, note, book_name, book_id FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
 
     const notes = [];
     result.rows.forEach((note) => {
@@ -77,6 +77,7 @@ app.post("/addbook", async(req, res) => {
     res.redirect("/");
 });
 
+// Handle logic that adds new notes into the db
 app.post("/addnote", async(req, res) => {
     const note = req.body.note;
     const book_id = req.body.book_id;
@@ -89,6 +90,20 @@ app.post("/addnote", async(req, res) => {
     }
 
     res.redirect(`/books?id=${book_id}`);
+});
+
+// Handles the logic for the deletion of notes.
+app.post("/delete_note", async(req, res) => {
+    const noteId = req.body.note_id;
+    const bookId = req.body.book_id;
+
+    try {
+        db.query("DELETE FROM notes WHERE notes.id=$1", [noteId]);
+        res.redirect(`/books?id=${bookId}`);
+    } catch (error) {
+        console.error("Error deleting note: " + error);
+        res.status(500);
+    }
 });
 
 // Activates the port

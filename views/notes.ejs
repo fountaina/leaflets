@@ -5,7 +5,13 @@
         <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
         <ol>
             <% notes.forEach((note) => { %>
-                <li> <%= note.note %> </li>
+                <li id="<%=note.id%>"> <%= note.note %> </li>
+
+                <form action="/delete_note" method="POST">
+                    <input type="hidden" name="note_id" value="<%= note.id %>">
+                    <input type="hidden" name="book_id" value="<%= note.book_id %>">
+                    <button class="delete_note" type="submit">Delete Note</button>
+                </form>
             <% }); %>
         </ol>
     <% } else { %>
@@ -20,5 +26,16 @@
         <button type="submit">Add</button>
    </form>
 
+<!-- <script>
+    function deleteNoteHandler(event) {
+        alert("This button is kinda working");
+        window.location.href = "/delete_note";        
+    };
+
+    const deleteButtons = document.getElementsByClassName("delete_note");
+    for (let i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].addEventListener("click", deleteNoteHandler);
+    };
+</script> -->
 </body>
 </html>
