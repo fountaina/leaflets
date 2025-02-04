@@ -5,13 +5,21 @@
         <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
         <ol>
             <% notes.forEach((note) => { %>
-                <li id="<%=note.id%>"> <%= note.note %> </li>
+                <li> 
+                    <p id="note-<%=note.id%>"><%= note.note %></p> 
+                
 
-                <form action="/delete_note" method="POST">
-                    <input type="hidden" name="note_id" value="<%= note.id %>">
-                    <input type="hidden" name="book_id" value="<%= note.book_id %>">
-                    <button class="delete_note" type="submit">Delete Note</button>
-                </form>
+                    <form action="/delete_note" method="POST">
+                        <input type="hidden" name="note_id" value="<%= note.id %>">
+                        <input type="hidden" name="book_id" value="<%= note.book_id %>">
+                        <button class="delete_note" type="submit">Delete Note</button>
+                    </form>
+                    
+                    <button type="button" class="edit_button" onclick="editButtonHandler(this, <%=note.id%>)">Edit</button>
+                    <button type="button" class="save_button" style="display: none;">Save</button>
+                </li>
+
+                <!-- <form action="/edit_note" method="POST"></form> -->
             <% }); %>
         </ol>
     <% } else { %>
@@ -26,16 +34,33 @@
         <button type="submit">Add</button>
    </form>
 
-<!-- <script>
-    function deleteNoteHandler(event) {
-        alert("This button is kinda working");
-        window.location.href = "/delete_note";        
+<script>
+    
+    function editButtonHandler(element, noteId) {
+        // Gets the Note, edit and Save buton
+        let noteElement = document.getElementById(`note-${noteId}`);
+        let editButton = noteElement.nextElementSibling.nextElementSibling; // Identifies the edit button which is two nodes away from the noteElement
+        let saveButton = editButton.nextElementSibling; // Identifies the Save button which is a node away from the Edit button.
+
+        // Gets default note value(<p>) and creates a new input element
+        let oldElement = document.getElementById("note-" + noteId);
+        let newElement = document.createElement("input");
+
+        console.log("Old element text content: " + oldElement.textContent + " ID: " + noteId);
+
+        newElement.value = oldElement.textContent;
+        console.log("This is the textContent of new element: " + newElement.value);
+        element.parentNode.replaceChild(newElement, oldElement);
+        newElement.focus(); // focuses the cursor on the new input element
+        
+        // Hides the edit button and displays the save button.
+        editButton.style.display = "none";
+        saveButton.style.display = "inline-block";
     };
 
-    const deleteButtons = document.getElementsByClassName("delete_note");
-    for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener("click", deleteNoteHandler);
-    };
-</script> -->
+    function saveButtonHandler (element) {
+        
+    }
+</script>
 </body>
 </html>
