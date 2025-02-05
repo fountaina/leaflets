@@ -43,11 +43,17 @@
 
    <script>
         function handler(noteId) {
+            let inputField = document.getElementById(`input-${noteId}`);
+
             document.getElementById(`note-${noteId}`).setAttribute("hidden", true);
             document.getElementById(`edit-${noteId}`).setAttribute("hidden", true);
-            document.getElementById(`input-${noteId}`).removeAttribute("hidden");
+            inputField.removeAttribute("hidden");
             document.getElementById(`saveNote-${noteId}`).removeAttribute("hidden");
-            document.getElementById(`input-${noteId}`).focus();
+
+            // Move cursor to the end of text
+            inputField.focus();
+            let length = inputField.value.length;
+            inputField.setSelectionRange(length, length); // Place cursor at the end
         }
    </script>
 
