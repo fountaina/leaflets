@@ -7,6 +7,7 @@ const port = 3000;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 db.connect();
 
@@ -80,16 +81,16 @@ app.post("/addbook", async(req, res) => {
 // Handle logic that adds new notes into the db
 app.post("/addnote", async(req, res) => {
     const note = req.body.note;
-    const book_id = req.body.book_id;
+    const bookId = req.body.book_id;
 
     try {
-        db.query("INSERT INTO notes (note, book_id) VALUES ($1, $2)", [note, book_id]);
+        db.query("INSERT INTO notes (note, book_id) VALUES ($1, $2)", [note, bookId]);
     } catch (error) {
         console.error("Error adding new note: " + error);
         res.status(500).send("Error adding new note!");
     }
 
-    res.redirect(`/books?id=${book_id}`);
+    res.redirect(`/books?id=${bookId}`);
 });
 
 // Handles the logic for the deletion of notes.
@@ -104,6 +105,22 @@ app.post("/delete_note", async(req, res) => {
         console.error("Error deleting note: " + error);
         res.status(500);
     }
+});
+
+app.post("/edit_note", async(req, res) => {
+    const editedNote = req.body.editedNote;
+    console.log(typeof(req.body.noteId));
+    const noteId = req.body.noteId;
+    const bookId = req.body.bookId;
+    
+    try {
+        db.query("UPDATE notes SET note=$1 WHERE id=$2", [editedNote, noteId]);
+        res.redirect(`/books?id=${bookId}`);
+    } catch (error) {
+        console.error("Error editing this note: " + error);
+        res.status(500);
+    }
+
 });
 
 // Activates the port
