@@ -37,21 +37,21 @@
 <script>
 
     function modeSwitcher(operationCode, noteId, element) {
-        // Gets the Note, edit and Save buton
-        let noteElement = document.getElementById(`note-${noteId}`);
-        let editButton = noteElement.nextElementSibling.nextElementSibling; // Identifies the edit button which is two nodes away from the noteElement
-        let saveButton = editButton.nextElementSibling; // Identifies the Save button which is a node away from the Edit button.
+        // // Gets the Note parent, Note, edit and Save buton
+        let noteItem = element.closest("li"); // Find the closest list item
+        let noteElement = noteItem.querySelector(`#note-${noteId}`);
+        let editButton = noteItem.querySelector(".edit_button");
+        let saveButton = noteItem.querySelector(".save_button");
 
         // operationCode = 1 to enter edit mode when edit button is clicked. Edit button will hide.
         // operationCode = 2 to leave edit mode when save button is clicked and note is saved succesfully.
         if (operationCode){
             // Gets default note value(<p>) and creates a new input element
-            let oldElement = document.getElementById("note-" + noteId);
             let newElement = document.createElement("input");
 
-            newElement.value = oldElement.textContent;
+            newElement.value = noteElement.textContent;
             newElement.id = `note-${noteId}`;
-            element.parentNode.replaceChild(newElement, oldElement);
+            noteItem.replaceChild(newElement, noteElement);
             newElement.focus(); // focuses the cursor on the new input element
 
             // Hides the edit button and displays the save button.
@@ -59,13 +59,11 @@
             saveButton.style.display = "inline-block";
         } else {
             // Gets default note value(<p>) and creates a new input element
-            let oldElement = document.getElementById("note-" + noteId);
             let newElement = document.createElement("p");
 
-            newElement.textContent = oldElement.value;
+            newElement.textContent = noteElement.value;
             newElement.id = `note-${noteId}`;
-            element.parentNode.replaceChild(newElement, oldElement);
-            // newElement.focus(); // focuses the cursor on the new input element
+            noteItem.replaceChild(newElement, noteElement);
 
             editButton.style.display = "inline-block";
             saveButton.style.display = "none";
@@ -81,27 +79,32 @@
         let noteElement = document.getElementById(`note-${noteId}`);
         let note = noteElement.value;
         
-        if (!note) {
+        if (!note.trim()) {
+            //trim() is to remove any leading or trailing space.
             alert("ERROR! NOTE IS EMPTY")
         } else {
             console.log("Typeof note: " + typeof(bookId));
             console.log("book Id content: " + bookId);
         }
 
-        //Using the fetch API to set a POST request
-        const response = await fetch("/edit_note", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ editedNote: note, noteId: noteId, bookId: bookId}), // Properly wrap note in an object
-        });
+        // Using the fetch API to set a POST request
+        try {
+            const response = await fetch("/edit_note", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ editedNote: note, noteId: noteId, bookId: bookId}), // Properly wrap note in an object
+            });
 
-        if (response.ok) {
+            if(!response) {
+                throw new Error(`Http error! Status: ${response.status}`);
+            }
+
             modeSwitcher(0, noteId, element);
             console.log("Note saved successfully");
-        } else {
-            console.error("Error saving note");
+
+        } catch (error) {
+            console.error("Error saving note:", error);
+            alert("Failed to save note. Please try again.");
         }
 }
 
