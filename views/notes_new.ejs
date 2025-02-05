@@ -1,0 +1,55 @@
+<body>
+    <%- include ("partials/header.ejs") %>
+
+    <% if (notes.length != 0) { %>
+        <h3>My Notes on <em> <%= notes[0].book_name %> </em></h3>
+        <ol>
+            <% notes.forEach((note) => { %>
+                <li> 
+                    <p id="note-<%=note.id%>">
+                        <%= note.note %>
+                    </p> 
+
+                    <form action="/edit_note" method="POST">
+                        <input type="hidden" name="noteId" value="<%= note.id %>">
+                        <input type="hidden" name="bookId" value="<%= note.book_id %>">
+                        <input id="input-<%=note.id%>" type="text" name="editedNote" value="<%= note.note %>" hidden="true">
+                        <button id="saveNote-<%=note.id%>" type="submit" class="save_button" hidden="true">Save</button>
+                    </form>
+                    
+                    <button id="edit-<%=note.id%>" type="button" class="edit_button" onclick="handler('<%= note.id %>')">Edit</button>
+                    
+                    <form action="/delete_note" method="POST">
+                        <input type="hidden" name="note_id" value="<%= note.id %>">
+                        <input type="hidden" name="book_id" value="<%= note.book_id %>">
+                        <button class="delete_note" type="submit">Delete Note</button>
+                    </form>
+                </li>
+
+                <!-- <form action="/edit_note" method="POST"></form> -->
+            <% }); %>
+        </ol>
+    <% } else { %>
+        <h3>No notes for this book!</h3>
+    <% } %>
+
+   <em><h3>Add New Note</h3></em>
+   <form action="/addnote" method="POST">
+        <label for="note">Enter Note:</label>
+        <input type="text" id="note" name="note" required>
+        <input type="hidden" name="book_id" value="<%=bookId%>">
+        <button type="submit">Add</button>
+   </form>
+
+   <script>
+        function handler(noteId) {
+            document.getElementById(`note-${noteId}`).setAttribute("hidden", true);
+            document.getElementById(`edit-${noteId}`).setAttribute("hidden", true);
+            document.getElementById(`input-${noteId}`).removeAttribute("hidden");
+            document.getElementById(`saveNote-${noteId}`).removeAttribute("hidden");
+            document.getElementById(`input-${noteId}`).focus();
+        }
+   </script>
+
+</body>
+</html>

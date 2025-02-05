@@ -18,7 +18,7 @@ async function getBooks() {
     result.rows.forEach((book) => {
         books.push(book);
     });
-    console.log(books);
+    // console.log(books);
     return books;
   };
 
@@ -30,7 +30,7 @@ async function getNotes(bookId) {
     result.rows.forEach((note) => {
         notes.push(note);
     });
-    console.log(notes);
+    // console.log(notes);
     return notes;
 };
 
@@ -51,7 +51,8 @@ app.get("/books", async (req, res) => {
     const bookId = req.query.id;
     try {
         const notes = await getNotes(bookId);
-        res.render("notes.ejs", {notes: notes, bookId: bookId});
+        // res.render("notes.ejs", {notes: notes, bookId: bookId});
+        res.render("notes_new.ejs", {notes: notes, bookId: bookId});
     } catch (error) {
         console.error("Error fetching notes", error);
         res.status(500).send("Error fetching Notes!");
@@ -109,7 +110,6 @@ app.post("/delete_note", async(req, res) => {
 
 app.post("/edit_note", async(req, res) => {
     const editedNote = req.body.editedNote;
-    console.log(typeof(req.body.noteId));
     const noteId = req.body.noteId;
     const bookId = req.body.bookId;
     
