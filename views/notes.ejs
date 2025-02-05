@@ -16,7 +16,7 @@
                     </form>
                     
                     <button type="button" class="edit_button" onclick="editButtonHandler(this, <%=note.id%>)">Edit</button>
-                    <button type="button" class="save_button" style="display: none;" onclick="saveButtonHandler(this, <%=note.id%>, <%=note.book_id%>)">Save</button>
+                    <button type="button" class="save_button" style="display: none;" disabled onclick="saveButtonHandler(this, <%=note.id%>, <%=note.book_id%>)">Save</button>
                 </li>
 
                 <!-- <form action="/edit_note" method="POST"></form> -->
@@ -58,7 +58,6 @@
             editButton.style.display = "none";
             saveButton.style.display = "inline-block";
         } else {
-            // Gets default note value(<p>) and creates a new input element
             let newElement = document.createElement("p");
 
             newElement.textContent = noteElement.value;
@@ -67,11 +66,23 @@
 
             editButton.style.display = "inline-block";
             saveButton.style.display = "none";
+            saveButton.disabled = true;
         }
+    }
+
+    function enableSaveButton(noteId) {
+        let noteElement = document.getElementById(`note-${noteId}`);
+        let saveButton = noteElement.closest("li").querySelector(".save_button");
+    
+        noteElement.addEventListener("input", () => {
+            // saveButton.disabled = noteElement.value.trim() === "";
+            saveButton.disabled = false;
+        });
     }
 
     function editButtonHandler(element, noteId) {
         modeSwitcher(1, noteId, element);
+        enableSaveButton(noteId);
     };
 
     async function saveButtonHandler(element, noteId, bookId) {
@@ -106,7 +117,7 @@
             console.error("Error saving note:", error);
             alert("Failed to save note. Please try again.");
         }
-}
+    }
 
 </script>
 </body>
