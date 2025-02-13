@@ -1,14 +1,30 @@
 <body>
     <%- include ("partials/header.ejs") %>
 
-    <form action="/addbook" method="POST">
-        <label for="book_name">Book Name:</label>
+    <form action="/addbook" method="POST" class="custom-form">
+        <!-- <label for="book_name">Book Name:</label>
         <input type="text" id="book_name" name="book_name" required autofocus="True">
 
         <label for="author">Author:</label>
         <input type="text" id="author" name="author" required>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Submit</button> -->
+
+        <!--  -->
+        <label class="input input-bordered flex items-center gap-2" id="book_name" name="book_name" required autofocus="True">
+            Name
+            <input type="text" class="grow" placeholder="e.g Alice In Wonderland" />
+        </label>
+        <label class="input input-bordered flex items-center gap-2" id="author" name="author" required>
+            Author 
+            <input type="text" class="grow" placeholder="e.g William Shakespare" />
+        </label> 
+        <label class="input input-bordered flex items-center gap-2">
+            Upload Book Image
+            <input type="file" class="file-input file-input-bordered file-input-success w-full max-w-xs"/>
+        </label>
+        <button class="btn btn-active btn-accent text-2xl" type="submit">Submit</button> 
+        
     </form>
 </body>
 </html>

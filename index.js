@@ -1,13 +1,30 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { db } from "./db_config.js";
+import session from "express-session";
+import passport from "passport";
+import env from "dotenv";
+import bcrypt from "bcrypt";
 
 const app = express();
 const port = 3000;
+env.config();
+
+const saltRounds = 10;
 
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+}));
+
+//Initialize passport module
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 db.connect();
 
@@ -63,6 +80,32 @@ app.get("/books", async (req, res) => {
 // Displays the form page to add new book
 app.get("/newbook", async (req, res) => {
     res.render("newbook.ejs");
+});
+
+app.get("/register", async(req, res) => {
+    res.render("register.ejs");
+})
+
+//Handles logic for resgistering a new account
+app.post("/register", async(req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    bcrypt.hash(password, saltRounds, async(err, hash) => {
+        if(err) {
+            console.error("Error encrypting password: " + err);
+        } else {
+            try {
+                await db.query(
+                    "INSERT INTO users (username, password) VALUES($1, $2)", 
+                    [username, hash]
+                );
+                res.redirect("/login");
+            } catch (error) {
+                console.error("Error registering user: " + error);
+            }
+        }
+    });
 });
 
 // Handles logic for adding new book to the db
