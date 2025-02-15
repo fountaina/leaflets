@@ -5,6 +5,7 @@ import session from "express-session";
 import passport from "passport";
 import env from "dotenv";
 import bcrypt from "bcrypt";
+import {Strategy} from "passport-local";
 
 const app = express();
 const port = 3000;
@@ -19,6 +20,9 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: {
+        maxAge: 1000*60*60*24,
+    }
 }));
 
 //Initialize passport module
@@ -28,9 +32,15 @@ app.use(passport.session());
 
 db.connect();
 
-async function getBooks() {
+async function getUserBooks(userId) {
     // Gets all the books stored in the db
-    const result = await db.query("SELECT * FROM books");
+    // const result = await db.query(
+    //     "SELECT * FROM books"
+    // );
+    const result = await db.query(
+        "SELECT books.id, users.username, users.full_name, books.book_name, books.author FROM users JOIN books ON users.id = books.user_id WHERE users.id = $1;",
+        [userId]
+    );
     let books = [];
     result.rows.forEach((book) => {
         books.push(book);
@@ -41,7 +51,9 @@ async function getBooks() {
 
 async function getNotes(bookId) {
     // Gets all the notes for each book stored in db with the book name included
-    const result = await db.query("SELECT notes.id, note, book_name, book_id FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]);
+    const result = await db.query(
+        "SELECT notes.id, note, book_name, book_id FROM books INNER JOIN notes ON books.id = notes.book_id WHERE book_id=$1", [bookId]
+    );
 
     const notes = [];
     result.rows.forEach((note) => {
@@ -54,12 +66,17 @@ async function getNotes(bookId) {
 // Handles logic for landing page
 // Displays all the Books entered in the database
 app.get("/", async (req, res) => {
-    try {
-        const availableBooks = await getBooks();
-        res.render("index.ejs", {books: availableBooks});
-    } catch (error) {
-        console.error("Error fetching books", error);
-        res.status(500).send("Error fetching Books!");
+    console.log("The user: " + JSON.stringify(req.user));
+    if (req.isAuthenticated()) {
+        try {
+            const availableBooks = await getUserBooks(req.user.id);
+            res.render("index.ejs", {books: availableBooks});
+        } catch (error) {
+            console.error("Error fetching books", error);
+            res.status(500).send("Error fetching Books!");
+        }
+    } else {
+        res.redirect("/login");
     }
 });
 
@@ -79,15 +96,49 @@ app.get("/books", async (req, res) => {
 
 // Displays the form page to add new book
 app.get("/newbook", async (req, res) => {
-    res.render("newbook.ejs");
+    if (req.isAuthenticated) {
+        res.render("newbook.ejs");
+    } else {
+        res.redirect("/register");
+    }
 });
 
+//Displays the login page
+app.get("/login", async(req, res) => {
+    res.render("login.ejs");
+})
+
+//Logs user out of authenticated session.
+app.get("/logout", (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err)
+        } else {
+            res.redirect("/");
+        }
+    })
+})
+
+//Displays the page for registering new account
 app.get("/register", async(req, res) => {
     res.render("register.ejs");
 })
 
+app.post("/login", passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/login"
+}));
+
+
 //Handles logic for resgistering a new account
 app.post("/register", async(req, res) => {
+    function capitalizeName(str) {
+        return str.split(" ")
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(" ");
+    }
+
+    const fullName = capitalizeName(req.body.full_name);
     const username = req.body.username;
     const password = req.body.password;
 
@@ -97,8 +148,8 @@ app.post("/register", async(req, res) => {
         } else {
             try {
                 await db.query(
-                    "INSERT INTO users (username, password) VALUES($1, $2)", 
-                    [username, hash]
+                    "INSERT INTO users (username, password, full_name) VALUES($1, $2, $3)", 
+                    [username, hash, fullName]
                 );
                 res.redirect("/login");
             } catch (error) {
@@ -165,6 +216,46 @@ app.post("/edit_note", async(req, res) => {
     }
 
 });
+
+passport.use(
+    "local",
+    new Strategy(async function verify(username, password, cb) {
+        try {
+            const result = await db.query(
+                "SELECT * FROM users WHERE username=$1", [username]
+            )
+            if (result.rows.length > 0) {
+                const user = result.rows[0];
+                const storedHashedPassword = user.password;
+                bcrypt.compare(password, storedHashedPassword, (err, valid) => {
+                    if (err) {
+                        console.error("Error comparing passwords:", err);
+                        return cb(err);
+                      } else {
+                        if (valid) {
+                          return cb(null, user);
+                        } else {
+                          return cb(null, false);
+                        }
+                    }
+                });
+            } else {
+                return cb("User not found!");
+            }
+        } catch (error) {
+            console.log(err);
+        }
+    })
+);
+
+//serialize and deserialize user
+passport.serializeUser((user, cb) => {
+    cb(null, user);
+});
+
+passport.deserializeUser((user, cb) => {
+    cb(null, user);
+})
 
 // Activates the port
 app.listen(port, () => {

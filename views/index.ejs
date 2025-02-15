@@ -3,29 +3,41 @@
 
     <h1 class="text-4xl font-medium page-title">My Books</h1>
     <ol class="book-grid">
+      <% if (books.length > 0) { %>
         <% books.forEach((book) => { %>
-            <li> 
-              <div class="card bg-base-100 w-96 shadow-xl">
-                <figure>
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                    alt="Shoes" />
-                </figure>
-                <div class="card-body">
-                  <h2 class="card-title">
-                    <a class="btn-ghost" href="/books?id=<%= book.id %>"><%= book.book_name %> </a>
-                  </h2>
-                  <p><em><%= book.author%></em></p>
-                  <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                  </div>
+          <li> 
+            <div class="card bg-base-100 w-96 shadow-xl">
+              <figure>
+                <img
+                  src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+                  alt="Shoes" />
+              </figure>
+              <div class="card-body">
+                <h2 class="card-title">
+                  <a class="btn-ghost" href="/books?id=<%= book.id %>"><%= book.book_name %> </a>
+                </h2>
+                <p><em><%= book.author%></em></p>
+                <div class="card-actions justify-end">
+                  <button class="btn btn-primary">Buy Now</button>
                 </div>
               </div>
-            </li>
-        <% }); %>
+            </div>
+          </li>
+      <% }); %>
+      <% } else { %>
+        <h1 class="text-4xl font-medium">You Have No Books In Your Library</h1>
+      <% } %>
     </ol>
 
-    <h4><a href="/newbook">Add Book</a></h4>
+    <h4></h4>
+    <div class="add-button">
+      <a href="/newbook">
+        <button title="Add" class="cssbuttons-io-button">
+          <svg height="25" width="25" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" fill="currentColor"></path></svg>
+          <span>Add New Book</span>
+        </button>
+      </a>
+    </div>
 </body>
 
 <button class="my-button">HeLLO</button>
